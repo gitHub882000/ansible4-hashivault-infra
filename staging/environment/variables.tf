@@ -21,3 +21,19 @@ variable "num_azs" {
   type        = number
   default     = 3
 }
+
+variable "public_key_path" {
+  description = "Path to the public key for SSH to EC2 instance"
+  type        = string
+}
+
+variable "private_key_path" {
+  description = "Path to the private key for SSH to EC2 instance"
+  type        = string
+}
+
+variable "ansible_config" {
+  description = "Ansible server configurations"
+  type        = any
+  default     = {}
+}

@@ -5,5 +5,5 @@ output "server_name" {
 
 output "server_ssh_cmd" {
   description = "SSH to server with the command: "
-  value       = "ssh -i ${local.private_key_path} ubuntu@${aws_instance.this.public_ip}"
+  value       = "ssh -i key-pair.pem ubuntu@${local.bastion_host == "" ? aws_instance.this.public_ip : aws_instance.this.private_ip}"
 }
