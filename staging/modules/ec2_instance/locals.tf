@@ -11,6 +11,7 @@ locals {
   instance_type     = var.instance_type
   ami_name          = var.ami_name
   source_dest_check = var.source_dest_check
+  instance_profile_name = var.instance_profile_name
 
   root_block_device        = var.root_block_device
   ingress_with_cidr_blocks = var.ingress_with_cidr_blocks

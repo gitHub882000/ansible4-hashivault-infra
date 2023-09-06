@@ -122,9 +122,10 @@ resource "aws_secretsmanager_secret" "ssh_private" {
   recovery_window_in_days = 0 # Set to zero for this example to force delete during Terraform destroy
 }
 
+# Private key use secret binary since it contains newlines
 resource "aws_secretsmanager_secret_version" "ssh_private" {
   secret_id     = aws_secretsmanager_secret.ssh_private.id
-  secret_string = file(local.private_key_path)
+  secret_binary = base64encode(file(local.ssh_private_path))
 }
 
 resource "aws_secretsmanager_secret" "ssh_public" {
@@ -134,12 +135,61 @@ resource "aws_secretsmanager_secret" "ssh_public" {
 
 resource "aws_secretsmanager_secret_version" "ssh_public" {
   secret_id     = aws_secretsmanager_secret.ssh_public.id
-  secret_string = file(local.public_key_path)
+  secret_string = file(local.ssh_public_path)
 }
 
 ################################################################################
 # Ansible server
 ################################################################################
+resource "aws_iam_policy" "secretsmanager" {
+  name        = "${local.proj_name}-secretsmanager-policy"
+  description = "Provides permission to Secretsmanager"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "secretsmanager:GetSecretValue",
+        ]
+        Effect   = "Allow"
+        Resource = [
+          aws_secretsmanager_secret.ssh_private.arn
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role" "bastion" {
+  name = "${local.proj_name}-${local.ansible_config["name"]}-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = "RoleForEC2"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "bastion_secretsmanager" {
+  name       = "${local.proj_name}-bastion-secretsmanager-attachment"
+  roles      = [aws_iam_role.bastion.name]
+  policy_arn = aws_iam_policy.secretsmanager.arn
+}
+
+resource "aws_iam_instance_profile" "bastion_profile" {
+  name = "${local.proj_name}-profile"
+  role = aws_iam_role.bastion.name
+}
+
 module "ansible_server" {
   source = "../modules/ec2_instance"
 
@@ -152,4 +202,12 @@ module "ansible_server" {
   ingress_with_cidr_blocks = local.ansible_config["ingress_with_cidr_blocks"]
   egress_with_cidr_blocks  = local.ansible_config["egress_with_cidr_blocks"]
   user_data_filepath       = local.ansible_config["user_data_filepath"]
+  instance_profile_name = aws_iam_instance_profile.bastion_profile.name
+
+  depends_on = [
+    aws_route_table_association.public,
+    aws_route_table_association.private,
+    aws_secretsmanager_secret_version.ssh_private,
+    aws_secretsmanager_secret_version.ssh_public,
+  ]
 }

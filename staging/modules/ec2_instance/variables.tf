@@ -55,7 +55,13 @@ variable "egress_with_cidr_blocks" {
 variable "user_data_filepath" {
   description = "Path to the EC2 instance User Data bash file"
   type        = string
-  default     = ""
+  default     = null
+}
+
+variable "instance_profile_name" {
+  description = "Name of IAM instance profile"
+  type        = string
+  default     = null
 }
 
 variable "source_dest_check" {
