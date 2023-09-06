@@ -138,9 +138,21 @@ resource "aws_secretsmanager_secret_version" "ssh_public" {
   secret_string = file(local.ssh_public_path)
 }
 
+resource "aws_secretsmanager_secret" "playbooks_private" {
+  name                    = "${local.proj_name}-playbooks-private"
+  recovery_window_in_days = 0 # Set to zero for this example to force delete during Terraform destroy
+}
+
+resource "aws_secretsmanager_secret_version" "playbooks_private" {
+  secret_id     = aws_secretsmanager_secret.playbooks_private.id
+  secret_binary = base64encode(file(local.playbooks_private_path))
+}
+
 ################################################################################
 # Ansible server
 ################################################################################
+data "aws_caller_identity" "current" {}
+
 resource "aws_iam_policy" "secretsmanager" {
   name        = "${local.proj_name}-secretsmanager-policy"
   description = "Provides permission to Secretsmanager"
@@ -152,9 +164,9 @@ resource "aws_iam_policy" "secretsmanager" {
         Action = [
           "secretsmanager:GetSecretValue",
         ]
-        Effect   = "Allow"
+        Effect = "Allow"
         Resource = [
-          aws_secretsmanager_secret.ssh_private.arn
+          "arn:aws:secretsmanager:${local.aws_region}:${data.aws_caller_identity.current.account_id}:secret:${local.proj_name}*"
         ]
       },
     ]
@@ -202,12 +214,13 @@ module "ansible_server" {
   ingress_with_cidr_blocks = local.ansible_config["ingress_with_cidr_blocks"]
   egress_with_cidr_blocks  = local.ansible_config["egress_with_cidr_blocks"]
   user_data_filepath       = local.ansible_config["user_data_filepath"]
-  instance_profile_name = aws_iam_instance_profile.bastion_profile.name
+  instance_profile_name    = aws_iam_instance_profile.bastion_profile.name
 
   depends_on = [
     aws_route_table_association.public,
     aws_route_table_association.private,
     aws_secretsmanager_secret_version.ssh_private,
     aws_secretsmanager_secret_version.ssh_public,
+    aws_secretsmanager_secret_version.playbooks_private
   ]
 }

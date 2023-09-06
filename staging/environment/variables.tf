@@ -32,6 +32,11 @@ variable "ssh_private_path" {
   type        = string
 }
 
+variable "playbooks_private_path" {
+  description = "Path to the private key for SSH to Playbooks GitHub"
+  type        = string
+}
+
 variable "ansible_config" {
   description = "Ansible server configurations"
   type        = any

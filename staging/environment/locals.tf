@@ -13,8 +13,9 @@ locals {
   num_azs  = min(length(data.aws_availability_zones.available.names), var.num_azs)
   azs      = slice(data.aws_availability_zones.available.names, 0, local.num_azs)
 
-  ssh_private_path = var.ssh_private_path
-  ssh_public_path  = var.ssh_public_path
+  ssh_private_path       = var.ssh_private_path
+  ssh_public_path        = var.ssh_public_path
+  playbooks_private_path = var.playbooks_private_path
 
   ansible_config = var.ansible_config
 

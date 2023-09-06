@@ -112,7 +112,7 @@ resource "aws_instance" "this" {
   vpc_security_group_ids = [aws_security_group.this.id]
   key_name               = aws_key_pair.this.key_name
   source_dest_check      = local.source_dest_check
-  iam_instance_profile = local.instance_profile_name
+  iam_instance_profile   = local.instance_profile_name
 
   user_data_replace_on_change = true
   user_data                   = local.user_data_filepath == null ? null : file(local.user_data_filepath)

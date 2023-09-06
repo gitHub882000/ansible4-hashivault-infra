@@ -7,10 +7,10 @@ locals {
   tag_name_subnet     = "${local.proj_name}-${local.is_private ? "private" : "public"}"
   tag_bastion_host_sg = "${local.proj_name}-${local.bastion_host}"
 
-  name              = var.name
-  instance_type     = var.instance_type
-  ami_name          = var.ami_name
-  source_dest_check = var.source_dest_check
+  name                  = var.name
+  instance_type         = var.instance_type
+  ami_name              = var.ami_name
+  source_dest_check     = var.source_dest_check
   instance_profile_name = var.instance_profile_name
 
   root_block_device        = var.root_block_device

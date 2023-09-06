@@ -6,8 +6,8 @@ provider "aws" {
 # Spinup NAT, test-NAT, and Hashicorp Vault server
 ################################################################################
 module "servers" {
-  source = "../modules/ec2_instance"
-  for_each  = zipmap(local.servers_configs[*]["name"], local.servers_configs[*])
+  source   = "../modules/ec2_instance"
+  for_each = zipmap(local.servers_configs[*]["name"], local.servers_configs[*])
 
   proj_name                = local.proj_name
   is_private               = each.value["is_private"]
@@ -36,5 +36,5 @@ resource "aws_route" "public_nat" {
   count                  = length(data.aws_route_tables.private.ids)
   route_table_id         = data.aws_route_tables.private.ids[count.index]
   destination_cidr_block = "0.0.0.0/0"
-  network_interface_id            = module.servers["nat"].primary_network_interface_id
+  network_interface_id   = module.servers["nat"].primary_network_interface_id
 }
