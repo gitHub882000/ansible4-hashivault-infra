@@ -111,12 +111,8 @@ resource "aws_route_table_association" "private" {
 }
 
 ################################################################################
-# Store SSH key-pair with Secrets Manager
-# There should be multiple key-pairs corresponding to multiple servers
-# However, for the purpose of simplifying this lab, only 1 key-pair will be used
-#   for all servers
+# Private key to SSH to Bastion host, NAT, test-NAT and Hashicorp Vault servers
 ################################################################################
-#tfsec:ignore:aws-ssm-secret-use-customer-key
 resource "aws_secretsmanager_secret" "ssh_private" {
   name                    = "${local.proj_name}-ssh-private"
   recovery_window_in_days = 0 # Set to zero for this example to force delete during Terraform destroy
@@ -128,6 +124,9 @@ resource "aws_secretsmanager_secret_version" "ssh_private" {
   secret_binary = base64encode(file(local.ssh_private_path))
 }
 
+################################################################################
+# Public key to SSH to Bastion host, NAT, test-NAT and Hashicorp Vault servers
+################################################################################
 resource "aws_secretsmanager_secret" "ssh_public" {
   name                    = "${local.proj_name}-ssh-public"
   recovery_window_in_days = 0 # Set to zero for this example to force delete during Terraform destroy
@@ -138,6 +137,9 @@ resource "aws_secretsmanager_secret_version" "ssh_public" {
   secret_string = file(local.ssh_public_path)
 }
 
+################################################################################
+# Private key to SSH to GitHub repositories
+################################################################################
 resource "aws_secretsmanager_secret" "playbooks_private" {
   name                    = "${local.proj_name}-playbooks-private"
   recovery_window_in_days = 0 # Set to zero for this example to force delete during Terraform destroy
@@ -149,7 +151,33 @@ resource "aws_secretsmanager_secret_version" "playbooks_private" {
 }
 
 ################################################################################
-# Ansible server
+# Private key for Hashicorp Vault TLS encryption
+################################################################################
+resource "aws_secretsmanager_secret" "hashivault_key" {
+  name                    = "${local.proj_name}-hashivault-key"
+  recovery_window_in_days = 0 # Set to zero for this example to force delete during Terraform destroy
+}
+
+resource "aws_secretsmanager_secret_version" "hashivault_key" {
+  secret_id     = aws_secretsmanager_secret.hashivault_key.id
+  secret_binary = base64encode(file(local.hashivault_key_path))
+}
+
+################################################################################
+# Certificate for Hashicorp Vault TLS encryption
+################################################################################
+resource "aws_secretsmanager_secret" "hashivault_cert" {
+  name                    = "${local.proj_name}-hashivault-cert"
+  recovery_window_in_days = 0 # Set to zero for this example to force delete during Terraform destroy
+}
+
+resource "aws_secretsmanager_secret_version" "hashivault_cert" {
+  secret_id     = aws_secretsmanager_secret.hashivault_cert.id
+  secret_binary = base64encode(file(local.hashivault_cert_path))
+}
+
+################################################################################
+# Deploy Ansible server
 ################################################################################
 data "aws_caller_identity" "current" {}
 
@@ -197,8 +225,8 @@ resource "aws_iam_policy_attachment" "bastion_secretsmanager" {
   policy_arn = aws_iam_policy.secretsmanager.arn
 }
 
-resource "aws_iam_instance_profile" "bastion_profile" {
-  name = "${local.proj_name}-profile"
+resource "aws_iam_instance_profile" "bastion" {
+  name = "${local.proj_name}-${local.ansible_config["name"]}-profile"
   role = aws_iam_role.bastion.name
 }
 
@@ -214,7 +242,7 @@ module "ansible_server" {
   ingress_with_cidr_blocks = local.ansible_config["ingress_with_cidr_blocks"]
   egress_with_cidr_blocks  = local.ansible_config["egress_with_cidr_blocks"]
   user_data_filepath       = local.ansible_config["user_data_filepath"]
-  instance_profile_name    = aws_iam_instance_profile.bastion_profile.name
+  instance_profile_name    = aws_iam_instance_profile.bastion.name
 
   depends_on = [
     aws_route_table_association.public,
@@ -223,4 +251,18 @@ module "ansible_server" {
     aws_secretsmanager_secret_version.ssh_public,
     aws_secretsmanager_secret_version.playbooks_private
   ]
+}
+
+################################################################################
+# ElasticIP for Hashicorp Vault server
+################################################################################
+resource "aws_eip" "hashivault" {
+  domain = "vpc"
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" : "${local.tags.Name}-hashivault-eip"
+    }
+  )
 }

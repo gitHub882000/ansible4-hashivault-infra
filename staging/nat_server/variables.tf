@@ -10,8 +10,14 @@ variable "aws_region" {
   default     = "ap-southeast-1"
 }
 
-variable "servers_configs" {
-  description = "List of EC2 instances' configurations"
-  type        = list(any)
-  default     = []
+variable "nat_config" {
+  description = "NAT server configurations"
+  type        = any
+  default     = {}
+}
+
+variable "test_nat_config" {
+  description = "test-NAT server configurations"
+  type        = any
+  default     = {}
 }

@@ -37,6 +37,16 @@ variable "playbooks_private_path" {
   type        = string
 }
 
+variable "hashivault_key_path" {
+  description = "Path to the private key for Hashicorp Vault TLS"
+  type        = string
+}
+
+variable "hashivault_cert_path" {
+  description = "Path to the certificate for Hashicorp Vault TLS"
+  type        = string
+}
+
 variable "ansible_config" {
   description = "Ansible server configurations"
   type        = any

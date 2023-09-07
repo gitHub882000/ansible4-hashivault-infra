@@ -16,6 +16,8 @@ locals {
   ssh_private_path       = var.ssh_private_path
   ssh_public_path        = var.ssh_public_path
   playbooks_private_path = var.playbooks_private_path
+  hashivault_key_path    = var.hashivault_key_path
+  hashivault_cert_path   = var.hashivault_cert_path
 
   ansible_config = var.ansible_config
 

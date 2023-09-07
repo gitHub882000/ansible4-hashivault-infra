@@ -3,7 +3,8 @@ locals {
   aws_region           = var.aws_region
   tag_name_private_rtb = "${local.proj_name}-private"
 
-  servers_configs = var.servers_configs
+  nat_config      = var.nat_config
+  test_nat_config = var.test_nat_config
 
   tags = {
     Name        = var.proj_name

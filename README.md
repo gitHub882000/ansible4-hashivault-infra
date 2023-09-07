@@ -4,3 +4,7 @@ chmod u+x ansible_key_pair.pem ansible_public_key.pub -->
 
 ssh-keygen -t rsa -b 2048 -f ansible_key.pem
 chmod u+x ansible_key.pem ansible_key.pem.pub
+
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ../assets/hashivault.pem -out ../assets/hashivault.crt
+
+export VAULT_ADDR=https://vault.lab.aandd.io:8200
