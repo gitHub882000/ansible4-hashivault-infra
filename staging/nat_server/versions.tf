@@ -10,7 +10,7 @@ terraform {
 
   backend "s3" {
     bucket         = "ansible4-hashivault-tfstates"
-    key            = "hashivault_server/terraform.tfstate"
+    key            = "nat_server/terraform.tfstate"
     region         = "ap-southeast-1"
     dynamodb_table = "ansible4-hashivault-tflocks"
   }
