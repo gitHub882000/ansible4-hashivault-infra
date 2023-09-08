@@ -35,6 +35,8 @@ Having completely deployed the AWS infrastructure using this repository, you can
 The overall directory structure of the project is as follow:
 
 ```
+develop/
+├─ .../
 production/
 ├─ .../
 staging/
@@ -56,7 +58,7 @@ staging/
 │  ├─ ...
 ```
 
-Where `develop`, `staging/`, and `production/` represents the workload environment. Each environment directory has nearly the same structure as follows:
+Where `develop`, `staging/`, and `production/` represents the workload environment. Although only `staging/` has the infrastructure code, theoretically, each environment directory should have the same structure as follows:
 
 1. `assets/` contains utilities that are referenced by Terraform modules. For example, `setup_bastion.sh` helps to setup secret keys, AWS CLI, and Ansible on the bastion host.
 2. `environment/` is a Terraform root module that deploys:
