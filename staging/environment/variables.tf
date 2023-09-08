@@ -23,27 +23,27 @@ variable "num_azs" {
 }
 
 variable "ssh_public_path" {
-  description = "Path to the public key for SSH to EC2 instance"
+  description = "Local path to the public key for SSH to EC2 instance"
   type        = string
 }
 
 variable "ssh_private_path" {
-  description = "Path to the private key for SSH to EC2 instance"
+  description = "Local path to the private key for SSH to EC2 instance"
   type        = string
 }
 
 variable "playbooks_private_path" {
-  description = "Path to the private key for SSH to Playbooks GitHub"
+  description = "Local path to the private key for SSH to Playbooks GitHub"
   type        = string
 }
 
 variable "hashivault_key_path" {
-  description = "Path to the private key for Hashicorp Vault TLS"
+  description = "Local path to the private key for Hashicorp Vault TLS"
   type        = string
 }
 
 variable "hashivault_cert_path" {
-  description = "Path to the certificate for Hashicorp Vault TLS"
+  description = "Local path to the full chain certificate for Hashicorp Vault TLS"
   type        = string
 }
 
