@@ -146,3 +146,5 @@ variable "hashivault_server_config" {
   default     = {}
 }
 ```
+
+3. The secret keys are currently stored in S3. In the future, a more secured vault mechanism should be leveraged.
