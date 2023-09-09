@@ -18,7 +18,7 @@ variable "hashivault_dynamo_table" {
 
 variable "hashivault_server_config" {
   description = "Hashivault server configurations"
-  type = {
+  type = object({
     is_private         = bool
     name               = string
     instance_type      = string
@@ -27,14 +27,14 @@ variable "hashivault_server_config" {
     bastion_host       = optional(string, "")
     source_dest_check  = optional(bool, true)
 
-    root_block_device = {
+    root_block_device = object({
       delete_on_termination = bool
       encrypted             = bool
       iops                  = number
       throughput            = number
       volume_size           = number
       volume_type           = string
-    }
+    })
 
     ingress_with_cidr_blocks = list(
       object({
@@ -55,5 +55,6 @@ variable "hashivault_server_config" {
         protocol    = string
       })
     )
-  }
+    }
+  )
 }

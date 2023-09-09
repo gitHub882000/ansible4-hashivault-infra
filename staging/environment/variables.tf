@@ -61,9 +61,9 @@ variable "ansible_config" {
     root_block_device = object({
       delete_on_termination = bool
       encrypted             = bool
-      iops                  = bool
-      throughput            = bool
-      volume_size           = bool
+      iops                  = number
+      throughput            = number
+      volume_size           = number
       volume_type           = string
     })
 
@@ -71,8 +71,8 @@ variable "ansible_config" {
       object({
         cidr_blocks = list(string)
         description = string
-        from_port   = bool
-        to_port     = bool
+        from_port   = number
+        to_port     = number
         protocol    = string
       })
     )
@@ -81,8 +81,8 @@ variable "ansible_config" {
       object({
         cidr_blocks = list(string)
         description = string
-        from_port   = bool
-        to_port     = bool
+        from_port   = number
+        to_port     = number
         protocol    = string
       })
     )

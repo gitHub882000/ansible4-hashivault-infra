@@ -12,7 +12,7 @@ variable "aws_region" {
 
 variable "nat_config" {
   description = "NAT server configurations"
-  type = {
+  type = object({
     is_private         = bool
     name               = string
     instance_type      = string
@@ -21,14 +21,14 @@ variable "nat_config" {
     bastion_host       = optional(string, "")
     source_dest_check  = optional(bool, true)
 
-    root_block_device = {
+    root_block_device = object({
       delete_on_termination = bool
       encrypted             = bool
       iops                  = number
       throughput            = number
       volume_size           = number
       volume_type           = string
-    }
+    })
 
     ingress_with_cidr_blocks = list(
       object({
@@ -49,12 +49,12 @@ variable "nat_config" {
         protocol    = string
       })
     )
-  }
+  })
 }
 
 variable "test_nat_config" {
   description = "test-NAT server configurations"
-  type = {
+  type = object({
     is_private         = bool
     name               = string
     instance_type      = string
@@ -63,14 +63,14 @@ variable "test_nat_config" {
     bastion_host       = optional(string, "")
     source_dest_check  = optional(bool, true)
 
-    root_block_device = {
+    root_block_device = object({
       delete_on_termination = bool
       encrypted             = bool
       iops                  = number
       throughput            = number
       volume_size           = number
       volume_type           = string
-    }
+    })
 
     ingress_with_cidr_blocks = list(
       object({
@@ -91,5 +91,6 @@ variable "test_nat_config" {
         protocol    = string
       })
     )
-  }
+    }
+  )
 }
