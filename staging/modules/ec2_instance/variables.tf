@@ -30,15 +30,14 @@ variable "ami_name" {
 
 variable "root_block_device" {
   description = "Root block device of EC2 instance"
-  type        = any
-  default     = {
-    delete_on_termination = true
-    encrypted             = true
-    iops                  = 3000
-    throughput            = 125
-    volume_size           = 10
-    volume_type           = "gp3"
-  }
+  type = object({
+    delete_on_termination = bool
+    encrypted             = bool
+    iops                  = number
+    throughput            = number
+    volume_size           = number
+    volume_type           = string
+  })
 }
 
 variable "bastion_host" {
@@ -49,30 +48,30 @@ variable "bastion_host" {
 
 variable "ingress_with_cidr_blocks" {
   description = "Security group ingress rules of EC2 instance with CIDR blocks"
-  type        = list(any)
-  default     = [
-    {
-      cidr_blocks = ["1.2.3.4/32"]
-      description = "Allow SSH from administrators"
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-    }
-  ]
+  type = list(
+    object({
+      cidr_blocks = list(string)
+      description = string
+      from_port   = number
+      to_port     = number
+      protocol    = string
+    })
+  )
+  default = []
 }
 
 variable "egress_with_cidr_blocks" {
   description = "Security group egress rules of EC2 instance with CIDR blocks"
-  type        = list(any)
-  default     = [
-    {
-      cidr_blocks = ["0.0.0.0/0"]
-      description = "Allow connections to Internet"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-    }
-  ]
+  type = list(
+    object({
+      cidr_blocks = list(string)
+      description = string
+      from_port   = number
+      to_port     = number
+      protocol    = string
+    })
+  )
+  default = []
 }
 
 variable "user_data_filepath" {

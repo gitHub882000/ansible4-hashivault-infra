@@ -137,9 +137,9 @@ terraform apply --auto-approve
 
 ## Some considerations
 
-1. With the current requirements, the Hashicorp Vault server is assumed to be accessed from anywhere on port `8200`.
+- [ ] With the current requirements, the Hashicorp Vault server is assumed to be accessed from anywhere on port `8200`.
 
-2. The schema for some Terraform variables is vague. `hashivault_server_config` variable of the `hashivault_server/` is a prime example of this. In the future, it would be structured more explicitly using the `object` data type.
+- [x] The schema for some Terraform variables is vague. `hashivault_server_config` variable of the `hashivault_server/` is a prime example of this. In the future, it would be structured more explicitly using the `object` data type.
 
 ```
 variable "hashivault_server_config" {
@@ -149,4 +149,4 @@ variable "hashivault_server_config" {
 }
 ```
 
-3. The secret keys are currently stored in S3. In the future, a more secured vault mechanism should be leveraged.
+- [ ] The secret keys are currently stored in S3. In the future, a more secured vault mechanism should be leveraged.
